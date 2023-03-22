@@ -42,8 +42,16 @@ function checkUsernameExists() {
     "message": "Password must be longer than 3 chars"
   }
 */
-function checkPasswordLength() {
-
+const checkPasswordLength = (req,res,next) => {
+  if(req.body.password.length > 3){
+    next()
+  }else{
+    next({message: "Password must be longer than 3 chars", status:422})
+  }
 }
 
 // Don't forget to add these to the `exports` object so they can be required in other modules
+
+module.exports = {
+  checkPasswordLength
+}
