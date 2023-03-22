@@ -3,9 +3,13 @@
 const router = require("express").Router()
 const bcrypt = require("bcryptjs")
 const userModel = require("../users/users-model")
-const {checkPasswordLength} = require("./auth-middleware")
+const {
+  checkPasswordLength,
+  checkUsernameExists,
+  checkUsernameFree
+} = require("./auth-middleware")
 
-router.post("/register",checkPasswordLength, (req,res) => {
+router.post("/register",checkUsernameFree,checkPasswordLength, (req,res) => {
   const {username,password} = req.body
   const hash = bcrypt.hashSync(password,12)
   userModel.add({username,password: hash}).then(promise => {
@@ -38,8 +42,13 @@ router.post("/register",checkPasswordLength, (req,res) => {
 
   router.post("/login", (req,res) => {
     const {username, password} = req.body
-    userModel.findBy({username}).first().then(promise => {
-
+    userModel.findBy({username}).first().then(user => {
+      if(user && bcrypt.compareSync(password, user.password)){
+        req.session.user = user
+        res.status(200).json({message: `Welcome ${username}!`})
+      }else{
+        res.status(401).json({message: "Invalid Credentials"})
+      }
     })
   })
 
@@ -60,6 +69,15 @@ router.post("/register",checkPasswordLength, (req,res) => {
   }
  */
 
+router.get("/logout",(req,res) => {
+  if(req.session.user) {
+    req.session.destroy(err => {
+        res.status(200).json({message:"logged out"})
+    })
+  }else{
+    res.status(200).json({message: "no session"})
+  }
+})
 
 /**
   3 [GET] /api/auth/logout
