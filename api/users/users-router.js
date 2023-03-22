@@ -2,8 +2,9 @@
 
 const router = require("express").Router()
 const userModel = require("./users-model")
+const {restricted} = require("../auth/auth-middleware")
 
-router.get("/", (req,res) => {
+router.get("/", restricted, (req,res) => {
   userModel.find().then(promise => {
     res.status(200).json(promise)
   })
