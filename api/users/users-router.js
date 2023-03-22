@@ -9,19 +9,6 @@ router.get("/", (req,res) => {
   })
 })
 
-router.get("/:id", (req,res) => {
-  userModel.findById(req.params.id).then(promise => {
-    res.status(200).json(promise)
-  })
-})
-
-router.post("/", (req,res) => {
-  const userToAdd = req.body
-  userModel.add(userToAdd).then(promise => {
-    res.status(200).json(promise)
-  })
-})
-
 /**
   [GET] /api/users
 
